@@ -16,8 +16,7 @@ public class ConsumerApp {
 
 		// Create consumer on a topic with a subscription
 		Consumer<?> consumer = client.newConsumer().topic(util.PULSAR_TOPIC_FULLPATH)
-				.subscriptionName(util.PULSAR_SUBSCRIPTION).subscriptionType(SubscriptionType.Exclusive)
-				.subscribe();
+				.subscriptionName(util.PULSAR_SUBSCRIPTION).subscriptionType(SubscriptionType.Exclusive).subscribe();
 		System.out.println("Consumer started using Pulsar service at " + util.SERVICE_URL);
 
 		boolean receivedMsg;

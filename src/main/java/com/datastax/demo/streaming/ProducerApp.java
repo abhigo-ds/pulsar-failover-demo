@@ -10,7 +10,6 @@ import org.apache.pulsar.client.api.PulsarClientException;
 
 public class ProducerApp {
 
-
 	public static void main(String[] args) throws IOException {
 		StreamUtil util = new StreamUtil();
 		PulsarClient client = util.getClient();
