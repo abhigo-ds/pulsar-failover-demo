@@ -1,43 +1,46 @@
 package com.datastax.demo.streaming;
 
-import org.apache.pulsar.client.api.*;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.pulsar.client.api.AuthenticationFactory;
+import org.apache.pulsar.client.api.Consumer;
+import org.apache.pulsar.client.api.Message;
+import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.SubscriptionType;
+
 public class ConsumerApp {
 
-	private static final String SERVICE_URL = "<your pulsar service url>";
-	private static final String PULSAR_AUTH_TOKEN = "<your pulsar token>";
-	private static final String PULSAR_TOPIC_FULLPATH = "<your pulsar topic>";
-	private static final String PULSAR_SUBSCRIPTION = "<your pulsar topic subscription>";
-	private static final int CLIENT_WAIT_IN_SECONDS = 10;
-	private static final int CONSUMING_DELAY_IN_MILLISECONDS = 300;
+	private static final String serviceURL = StreamUtil.SERVICE_URL_EAST1;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		PulsarClient client = PulsarClient.builder().serviceUrl(SERVICE_URL)
-				.authentication(AuthenticationFactory.token(PULSAR_AUTH_TOKEN)).build();
+		PulsarClient client = PulsarClient.builder().serviceUrl(serviceURL)
+				.authentication(AuthenticationFactory.token(StreamUtil.PULSAR_AUTH_TOKEN_EAST1)).build();
 
 		// Create consumer on a topic with a subscription
-		Consumer<?> consumer = client.newConsumer().topic(PULSAR_TOPIC_FULLPATH).subscriptionName(PULSAR_SUBSCRIPTION)
-				.subscriptionType(SubscriptionType.Exclusive).subscribe();
-		System.out.println("Consumer started!");
+		Consumer<?> consumer = client.newConsumer().topic(StreamUtil.PULSAR_TOPIC_FULLPATH)
+				.subscriptionName(StreamUtil.PULSAR_SUBSCRIPTION).subscriptionType(SubscriptionType.Exclusive)
+				.subscribe();
+		System.out.println("Consumer started using Pulsar service at " + serviceURL);
 
-		boolean receivedMsg = false;
-		do { // Process message blacklog & wait upto 10 secs for new message
+		boolean receivedMsg;
+		do { // Process message blacklog & wait CLIENT_WAIT_IN_SECONDS secs for new message
 			receivedMsg = false;
-			Message<?> msg = consumer.receive(CLIENT_WAIT_IN_SECONDS, TimeUnit.SECONDS);
+			Message<?> msg = consumer.receive(StreamUtil.CLIENT_WAIT_IN_SECONDS, TimeUnit.SECONDS);
 
 			if (msg != null) {
 				receivedMsg = true;
-				System.out.printf("Consumed msg: %s \n", new String(msg.getData()));
+				System.out.printf("Consumed msg: %s at %s\n", new String(msg.getData()), StreamUtil.getcurrentTime());
 
 				consumer.acknowledge(msg); // Remove consumed msg from backlog
-				TimeUnit.MILLISECONDS.sleep(CONSUMING_DELAY_IN_MILLISECONDS);
+				TimeUnit.MILLISECONDS.sleep(StreamUtil.CONSUMING_DELAY_IN_MILLISECONDS);
 			}
 		} while (receivedMsg);
-		System.out.println("Consumer: No new messages to process in the last 10 seconds, exiting!");
+		System.out.printf("Consumer: No new messages to process in the last %s seconds!\n",
+				StreamUtil.CLIENT_WAIT_IN_SECONDS);
 
 		// Close Consumer & client
+		System.out.println("Consumer Pulsar service at " + serviceURL + " shuting down!");
 		consumer.close();
 		client.close();
 	}
