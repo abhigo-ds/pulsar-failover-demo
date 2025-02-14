@@ -36,3 +36,13 @@ Then start the **Producer** app using the below command
 Then start the **Consumer** app using the below command
 `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp`
 
+
+### Performing failover
+The above demo app uses two SaaS cluster provided by Astra Streaming (ideally deployed in two different regions) with bidirectional replication. Internally it refers to them as **clusterA** and **clusterB**. 
+
+By default, clusterA is chosen as the **Primary** and clusterB as **DR/Failover**. 
+
+You can find which cluster is currently Primary anytime by hitting the Provider endpoint at `/getConfig`. If you are running the app locally, it can be access [here](http://localhost:8080/getconfig)
+
+To inject a failover, go to Provider endpoint `/setConfig` and pass the url param `cluster-name` with a value of the `cluster-name` you want to failover to.
+- If running locally, you could initiate a failover hitting endpoint `http://localhost:8080/setconfig?cluster-name=clusterB`
