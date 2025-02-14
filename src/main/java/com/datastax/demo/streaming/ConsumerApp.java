@@ -15,28 +15,30 @@ public class ConsumerApp {
 		PulsarClient client = util.getClient();
 
 		// Create consumer on a topic with a subscription
-		Consumer<?> consumer = client.newConsumer().topic(util.PULSAR_TOPIC_FULLPATH)
-				.subscriptionName(util.PULSAR_SUBSCRIPTION).subscriptionType(SubscriptionType.Exclusive).subscribe();
-		System.out.println("Consumer started using Pulsar service at " + util.SERVICE_URL);
+		Consumer<?> consumer = client.newConsumer().topic(util.getConfig().getTopicFullPath())
+				.subscriptionName(util.getConfig().getSubscription()).replicateSubscriptionState(true)
+				.subscriptionType(SubscriptionType.Exclusive).subscribe();
+		System.out.println("Consumer started using Pulsar service at " + util.getCurrentServiceUrl());
 
 		boolean receivedMsg;
 		do { // Process message blacklog & wait CLIENT_WAIT_IN_SECONDS secs for new message
 			receivedMsg = false;
-			Message<?> msg = consumer.receive(util.CLIENT_WAIT_IN_SECONDS, TimeUnit.SECONDS);
+			Message<?> msg = consumer.receive(util.getConfig().getConsumerWaitSeconds(), TimeUnit.SECONDS);
 
 			if (msg != null) {
 				receivedMsg = true;
-				System.out.printf("Consumed msg: %s at %s\n", new String(msg.getData()), util.getcurrentTime());
+				System.out.printf("Consuming: %s at %s on %s\n", new String(msg.getData()), util.getcurrentTime(),
+						util.getCurrentServiceUrl());
 
 				consumer.acknowledge(msg); // Remove consumed msg from backlog
-				TimeUnit.MILLISECONDS.sleep(util.CONSUMING_DELAY_IN_MILLISECONDS);
+				TimeUnit.MILLISECONDS.sleep(util.getConfig().getConsumerDelayMillis());
 			}
 		} while (receivedMsg);
 		System.out.printf("Consumer: No new messages to process in the last %s seconds!\n",
-				util.CLIENT_WAIT_IN_SECONDS);
+				util.getConfig().getConsumerWaitSeconds());
 
 		// Close Consumer & client
-		System.out.println("Consumer Pulsar service at " + util.SERVICE_URL + " shuting down!");
+		System.out.println("Consumer Pulsar service at " + util.getCurrentServiceUrl() + " shuting down!");
 		consumer.close();
 		client.close();
 	}

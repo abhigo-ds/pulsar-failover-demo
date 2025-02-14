@@ -13,22 +13,22 @@ public class ProducerApp {
 	public static void main(String[] args) throws IOException {
 		StreamUtil util = new StreamUtil();
 		PulsarClient client = util.getClient();
-		Producer<byte[]> producer = client.newProducer().topic(util.PULSAR_TOPIC_FULLPATH).create();
-		System.out.println("Producer started using Pulsar service at " + util.SERVICE_URL);
+		Producer<byte[]> producer = client.newProducer().topic(util.getConfig().getTopicFullPath()).create();
+		System.out.println("Producer started using Pulsar service at " + util.getCurrentServiceUrl());
 
-		IntStream.range(0, 100).forEach(i -> {
+        IntStream.iterate(1, n -> n + 1).forEach(i -> {
 			try {
-				String msg = "Message " + i + " " + util.getcurrentTime();
+				String msg = "Message " + i + " at " + util.getcurrentTime() + " from " + util.getCurrentServiceUrl();
 				producer.send(msg.getBytes());
-				System.out.printf("Sending msg: %s \n", msg);
-				TimeUnit.MILLISECONDS.sleep(util.PRODUCING_DELAY_IN_MILLISECONDS);
+				System.out.printf("Producing: %s \n", msg);
+				TimeUnit.MILLISECONDS.sleep(util.getConfig().getProducerDelayMillis());
 			} catch (PulsarClientException | InterruptedException e) {
 				e.printStackTrace();
 			}
 		});
 
 		// Close Producer & client
-		System.out.println("Producer Pulsar service at " + util.SERVICE_URL + " shuting down!");
+		System.out.println("Producer Pulsar service at " + util.getCurrentServiceUrl() + " shuting down!");
 		producer.close();
 		client.close();
 	}
