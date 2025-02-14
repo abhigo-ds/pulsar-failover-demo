@@ -19,7 +19,7 @@ Below is a high-level diagram of the above components and the Pulsar Controlled 
 - Pulsar 3.x 
 - Two (or more) Pulsar based Streaming clusters
   - One clusters will be the primary, while all the other clusters will be DR clusters that can takeover in case of a failover
-  - For the purpose of this demo, we will use Astra Streaming (A SaaS Streaming provider by DataStax) to standup two Pulsar based streaming clusters.
+  - For the purpose of this demo, we will use [Astra Streaming](https://www.datastax.com/products/astra-streaming) (A SaaS Streaming provider by DataStax) to standup two Pulsar based streaming clusters.
  
  
 ### Building the app
@@ -38,7 +38,7 @@ Then start the **Consumer** app using the below command
 
 
 ### Performing failover
-The above demo app uses two SaaS cluster provided by Astra Streaming (ideally deployed in two different regions) with bidirectional replication. Internally it refers to them as **clusterA** and **clusterB**. 
+The above demo app uses two SaaS clusters provided by [Astra Streaming](https://www.datastax.com/products/astra-streaming) (ideally deployed in two different regions) with bidirectional replication. Internally it refers to them as **clusterA** and **clusterB**. 
 
 By default, clusterA is chosen as the **Primary** and clusterB as **DR/Failover**. 
 
