@@ -1,4 +1,4 @@
-package com.datastax.demo.streaming;
+package com.datastax.demo.streaming.producer;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +7,8 @@ import java.util.stream.IntStream;
 import org.apache.pulsar.client.api.Producer;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
+
+import com.datastax.demo.streaming.StreamUtil;
 
 public class ProducerApp {
 

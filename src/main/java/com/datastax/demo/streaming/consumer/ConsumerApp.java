@@ -1,4 +1,4 @@
-package com.datastax.demo.streaming;
+package com.datastax.demo.streaming.consumer;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +7,8 @@ import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.SubscriptionType;
+
+import com.datastax.demo.streaming.StreamUtil;
 
 public class ConsumerApp {
 
