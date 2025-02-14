@@ -1,15 +1,15 @@
 package com.datastax.demo.streaming;
 
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class ClusterConfigProvider {
 
@@ -18,7 +18,7 @@ public class ClusterConfigProvider {
 
 	public static void main(String[] args) throws Exception {
 		StreamConfig config = new StreamConfig();
-		
+
 		List<String> clusters = config.getClusters();
 		currentConfigName = config.getClusterDefault();
 		clusters.forEach(cluster -> configMap.put(cluster,

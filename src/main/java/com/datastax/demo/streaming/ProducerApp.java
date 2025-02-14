@@ -16,7 +16,7 @@ public class ProducerApp {
 		Producer<byte[]> producer = client.newProducer().topic(util.getConfig().getTopicFullPath()).create();
 		System.out.println("Producer started using Pulsar service at " + util.getCurrentServiceUrl());
 
-        IntStream.iterate(1, n -> n + 1).forEach(i -> {
+		IntStream.iterate(1, n -> n + 1).forEach(i -> {
 			try {
 				String msg = "Message " + i + " at " + util.getcurrentTime() + " from " + util.getCurrentServiceUrl();
 				producer.send(msg.getBytes());
