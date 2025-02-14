@@ -8,4 +8,31 @@ This app has three components
 
 Below is a high-level diagram of the above components and the Pulsar Controlled Failover flow
 
-<img width="675" alt="cluster-level-failover-3-e4c1f0e86f1652f300f2bc54d342b955" src="https://github.com/user-attachments/assets/5a8ddeeb-8945-4378-b232-1b842ea4ea95" />
+<img width="675" alt="cluster-level-failover-3-e4c1f0e86f1652f300f2bc54d342b955" src="src/main/resources/cluster-level-failover.png" />
+
+
+------------
+
+### Prerequisites
+- Java 11
+- Apache Maven 3.8.x (to build the app)
+- Pulsar 3.x 
+- Two (or more) Pulsar based Streaming clusters
+ - One clusters will be the primary, while all the other clusters will be DR clusters that can takeover in case of a failover
+ - For the purpose of this demo, we will use Astra Streaming (A SaaS Streaming provider by DataStax) to standup two Pulsar based streaming clusters.
+ 
+ 
+### Building the app
+From the root folder of the repo, run the below command
+`mvn clean package -Passembly`
+
+### Running the app
+First start the **Provider** app using the below command
+`java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.provider.ClusterConfigProvider`
+
+Then start the **Producer** app using the below command
+`java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.producer.ProducerApp`
+
+Then start the **Consumer** app using the below command
+`java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp`
+
