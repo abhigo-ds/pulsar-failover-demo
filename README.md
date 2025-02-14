@@ -42,7 +42,7 @@ The above demo app uses two SaaS clusters provided by [Astra Streaming](https://
 
 By default, clusterA is chosen as the **Primary** and clusterB as **DR/Failover**. 
 
-You can find which cluster is currently Primary anytime by hitting the Provider endpoint at `/getConfig`. If you are running the app locally, it can be access [here](http://localhost:8080/getconfig)
+You can find which cluster is currently Primary anytime by hitting the Provider endpoint at `/getConfig`. If you are running the app locally, it can be access [here](http://localhost:8080/getconfig) `http://localhost:8080/getconfig`
 
 To inject a failover, go to Provider endpoint `/setConfig` and pass the url param `cluster-name` with a value of the `cluster-name` you want to failover to.
-- If running locally, you could initiate a failover hitting endpoint `http://localhost:8080/setconfig?cluster-name=clusterB`
+- If running locally, you could initiate a failover hitting [endpoint](http://localhost:8080/setconfig?cluster-name=clusterB) `http://localhost:8080/setconfig?cluster-name=clusterB`
