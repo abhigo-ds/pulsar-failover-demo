@@ -42,20 +42,21 @@ public class ClusterConfigProvider {
 			if ("GET".equals(exchange.getRequestMethod())) {
 				// Parse query parameters from the URL
 				Map<String, String> queryParams = queryToMap(exchange.getRequestURI().getQuery());
-				String configName = queryParams.get("config-name");
+				String clusterName = queryParams.get("cluster-name");
 				String response;
 
-				if (configName == null || configName.isEmpty()) {
+				if (clusterName == null || clusterName.isEmpty()) {
 					exchange.sendResponseHeaders(400, 0);
 					response = "Missing 'config-name' parameter.";
-				} else if (!configMap.containsKey(configName)) {
+				} else if (!configMap.containsKey(clusterName)) {
 					exchange.sendResponseHeaders(404, 0);
-					response = "Config '" + configName + "' not found.";
+					response = "Config '" + clusterName + "' not found.";
 				} else {
 					// Set the current configuration
-					currentConfigName = configName;
+					currentConfigName = clusterName;
+					ClusterConfig config = configMap.get(currentConfigName);
 					exchange.sendResponseHeaders(200, 0);
-					response = "Current config set to '" + configName + "'.";
+					response = "Current config set to '" + clusterName + "' (" + config.serviceUrl + ").";
 				}
 				try (OutputStream os = exchange.getResponseBody()) {
 					os.write(response.getBytes());

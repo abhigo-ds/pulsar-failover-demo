@@ -8,7 +8,7 @@ This app has three components
 
 Below is a high-level diagram of the above components and the Pulsar Controlled Failover flow
 
-<img width="675" alt="cluster-level-failover-3-e4c1f0e86f1652f300f2bc54d342b955" src="src/main/resources/cluster-level-failover.png" />
+<img width="675" src="src/main/resources/images/cluster-level-failover.png" />
 
 
 ------------
@@ -46,3 +46,33 @@ You can find which cluster is currently Primary anytime by hitting the Provider 
 
 To inject a failover, go to Provider endpoint `/setConfig` and pass the url param `cluster-name` with a value of the `cluster-name` you want to failover to.
 - If running locally, you could initiate a failover hitting [endpoint](http://localhost:8080/setconfig?cluster-name=clusterB) `http://localhost:8080/setconfig?cluster-name=clusterB`
+
+
+------------
+
+
+### Demo 
+- Start `Provider`, followed by `Producer` and `Consumer`. Producer and Consumer messages show `clusterA` (useast1) as the primary (see below screenshots)
+
+  <img width="900" src="src/main/resources/images/ProviderStart.png" />
+  
+  <img width="900" src="src/main/resources/images/ProducerStart.png" />
+  
+  <img width="900" src="src/main/resources/images/ConsumerStart.png" />
+
+
+- On `Provider`, check the current Cluster via a tool like Postname (see below screenshots)
+
+  <img width="900" src="src/main/resources/images/ProviderGetConfig.png" />
+
+
+- On `Provider`, perform failover to `clusterB`
+
+  <img width="900" src="src/main/resources/images/ProviderSetConfig.png" />
+
+
+- Now `Producer` and `Consumer` messages should show `clusterB` (useast4) post failover
+
+  <img width="675" src="src/main/resources/images/ProducerFailover.png" />
+  
+  <img width="900" src="src/main/resources/images/ConsumerFailover.png" />
