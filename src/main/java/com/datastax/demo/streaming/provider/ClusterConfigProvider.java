@@ -12,6 +12,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import org.json.JSONObject;
+
 public class ClusterConfigProvider {
 
 	private static final Map<String, ClusterConfig> configMap = new HashMap<>();
@@ -39,15 +41,16 @@ public class ClusterConfigProvider {
 	static class SetConfigHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
-			if ("GET".equals(exchange.getRequestMethod())) {
-				// Parse query parameters from the URL
-				Map<String, String> queryParams = queryToMap(exchange.getRequestURI().getQuery());
-				String clusterName = queryParams.get("cluster-name");
+			if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+				// Read the entire POST request body as a string (assumes UTF-8 encoding)
+				String body = new String(exchange.getRequestBody().readAllBytes(), "UTF-8");
+				Map<String, String> params = jsonToMap(body);
+				String clusterName = params.get("cluster-name");
 				String response;
 
 				if (clusterName == null || clusterName.isEmpty()) {
 					exchange.sendResponseHeaders(400, 0);
-					response = "Missing 'config-name' parameter.";
+					response = "Missing 'cluster-name' parameter.";
 				} else if (!configMap.containsKey(clusterName)) {
 					exchange.sendResponseHeaders(404, 0);
 					response = "Config '" + clusterName + "' not found.";
@@ -93,20 +96,14 @@ public class ClusterConfigProvider {
 		}
 	}
 
-	// Utility method to parse query parameters from a query string
-	private static Map<String, String> queryToMap(String query) {
+	private static Map<String, String> jsonToMap(String json) {
 		Map<String, String> result = new HashMap<>();
-		if (query == null) {
+		if (json == null || json.trim().isEmpty()) {
 			return result;
 		}
-		String[] params = query.split("&");
-		for (String param : params) {
-			String[] entry = param.split("=");
-			if (entry.length > 1) {
-				result.put(entry[0], entry[1]);
-			} else {
-				result.put(entry[0], "");
-			}
+		JSONObject jsonObject = new JSONObject(json);
+		for (String key : jsonObject.keySet()) {
+			result.put(key, jsonObject.get(key).toString());
 		}
 		return result;
 	}
