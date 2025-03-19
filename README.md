@@ -26,11 +26,14 @@ Below is a high-level diagram of the above components and the Pulsar Controlled 
 From root of this repo, run command `mvn clean package -Passembly`
 
 ### Running the app
-First start the **Provider** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.provider.ClusterConfigProvider`
+First start the **Provider** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.provider.ClusterConfigProvider` 
 
-Then start the **Producer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.producer.ProducerApp`
+Then start the **Producer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.producer.ProducerApp` 
 
-Finally start the **Consumer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp`
+Finally start the **Consumer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp` 
+
+> [!NOTE]
+> You can have as many (one or more) instances of `Producers` and `Consumer`, however you must have only one instance of `Provider`. 
 
 
 ### Performing failover
@@ -38,8 +41,7 @@ The above demo app uses two [Astra Streaming](https://www.datastax.com/products/
 
 You can find which cluster is currently Primary at anytime by hitting the Provider endpoint at `/getConfig`. If you are running the app locally, it can be accessed [here](http://localhost:8080/getconfig) `http://localhost:8080/getconfig`
 
-To inject a failover, go to Provider endpoint `/setConfig` and pass the url param `cluster-name` with a value of the `clusterA` OR `clusterB` based on the cluster you want to failover to.
-- If running locally, you could initiate a failover hitting [endpoint](http://localhost:8080/setconfig?cluster-name=clusterB) `http://localhost:8080/setconfig?cluster-name=clusterB`
+To inject a failover, go to Provider endpoint `/setConfig` and pass a JSON request body of `{"cluster-name": "clusterB"}`. Note, the value can be `clusterA` OR `clusterB` based on the cluster you want to failover to.  If running locally, you could initiate a failover by posting the above JSON body to [endpoint](http://localhost:8080/setconfig) `http://localhost:8080/setconfig`
 
 
 ------------
