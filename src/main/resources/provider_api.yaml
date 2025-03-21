@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Provider API
+  version: 1.0.0
+  description: API for managing instances, groups, and clusters.
+
+paths:
+  /instances:
+    get:
+      summary: Get all instances
+      responses:
+        '200':
+          description: A list of all registered instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instance'
+    post:
+      summary: Register a new instance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Instance'
+      responses:
+        '201':
+          description: Instance registered successfully
+
+  /instances/{name}:
+    patch:
+      summary: Update an instance's group
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: new-group
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Instance group updated successfully
+
+  /groups:
+    get:
+      summary: Get all groups
+      responses:
+        '200':
+          description: A list of all groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+    post:
+      summary: Create a new group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+      responses:
+        '201':
+          description: Group created successfully
+
+  /groups/{name}:
+    patch:
+      summary: Update a group's cluster mapping
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: new-cluster
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group cluster mapping updated successfully
+    delete:
+      summary: Delete a group
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group deleted successfully
+
+  /clusters:
+    get:
+      summary: Get all clusters
+      responses:
+        '200':
+          description: A list of all clusters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cluster'
+
+components:
+  schemas:
+    Instance:
+      type: object
+      required:
+        - name
+        - region
+      properties:
+        name:
+          type: string
+        region:
+          type: string
+        group:
+          type: string
+    Group:
+      type: object
+      required:
+        - name
+        - cluster
+      properties:
+        name:
+          type: string
+        cluster:
+          type: string
+    Cluster:
+      type: object
+      required:
+        - name
+        - url
+        - region
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        region:
+          type: string
