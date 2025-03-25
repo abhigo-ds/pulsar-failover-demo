@@ -4,28 +4,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
+import com.datastax.demo.streaming.Cluster;
 import com.datastax.demo.streaming.StreamConfig;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import org.json.JSONObject;
-
 public class ClusterConfigProvider {
 
-	private static final Map<String, ClusterConfig> configMap = new HashMap<>();
-	private static String currentConfigName;
+	private static final Map<String, Cluster> configMap = new HashMap<>();
+	private static Cluster currentConfig;
 
 	public static void main(String[] args) throws Exception {
 		StreamConfig config = new StreamConfig();
-
-		List<String> clusters = config.getClusters();
-		currentConfigName = config.getClusterDefault();
-		clusters.forEach(cluster -> configMap.put(cluster,
-				new ClusterConfig(config.getServiceUrl(cluster), config.getAuthToken(cluster))));
+		config.getClusters().forEach(cluster -> configMap.put(cluster.getName(), cluster));
+		currentConfig = config.getDefaultCluster();
 
 		// Create HTTP service with REST endpoints
 		HttpServer server = HttpServer.create(new InetSocketAddress(config.getProviderPort()), 0);
@@ -56,10 +53,9 @@ public class ClusterConfigProvider {
 					response = "Config '" + clusterName + "' not found.";
 				} else {
 					// Set the current configuration
-					currentConfigName = clusterName;
-					ClusterConfig config = configMap.get(currentConfigName);
+					currentConfig = configMap.get(clusterName);
 					exchange.sendResponseHeaders(200, 0);
-					response = "Current config set to '" + clusterName + "' (" + config.serviceUrl + ").";
+					response = "Current config set to '" + clusterName + "' (" + currentConfig.getUrl() + ").";
 				}
 				try (OutputStream os = exchange.getResponseBody()) {
 					os.write(response.getBytes());
@@ -75,15 +71,14 @@ public class ClusterConfigProvider {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			if ("GET".equals(exchange.getRequestMethod())) {
-				if (currentConfigName == null) {
+				if (currentConfig == null) {
 					String response = "No config set. Use /setconfig?config-name=xxx to set a config.";
 					exchange.sendResponseHeaders(404, response.getBytes().length);
 					try (OutputStream os = exchange.getResponseBody()) {
 						os.write(response.getBytes());
 					}
 				} else {
-					ClusterConfig config = configMap.get(currentConfigName);
-					String jsonResponse = config.toJson();
+					String jsonResponse = currentConfig.toJson();
 					exchange.getResponseHeaders().add("Content-Type", "application/json");
 					exchange.sendResponseHeaders(200, jsonResponse.getBytes().length);
 					try (OutputStream os = exchange.getResponseBody()) {
@@ -108,22 +103,4 @@ public class ClusterConfigProvider {
 		return result;
 	}
 
-	// Config POJO
-	static class ClusterConfig {
-		private final String serviceUrl;
-		private final String authToken;
-		private final String authPluginClassName = "org.apache.pulsar.client.impl.auth.AuthenticationToken";
-
-		public ClusterConfig(String serviceUrl, String authToken) {
-			this.serviceUrl = serviceUrl;
-			this.authToken = authToken;
-		}
-
-		public String toJson() {
-			return String.format(
-					"{" + "\"serviceUrl\":\"%s\", " + "\"authPluginClassName\":\"%s\","
-							+ "\"tlsHostnameVerificationEnable\":\"true\"," + "\"authParamsString\":\"%s\"}",
-					serviceUrl, authPluginClassName, authToken);
-		}
-	}
 }

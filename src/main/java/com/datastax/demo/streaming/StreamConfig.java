@@ -1,35 +1,65 @@
 package com.datastax.demo.streaming;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class StreamConfig {
 
-	private List<String> clusters;
-	private String clusterDefault;
+	private static final int MAX_CLUSTERS = 10;
+
+	private List<Cluster> clusters;
+	private Cluster defaultCluster;
 	private String topicFullPath;
 	private String subscription;
 	private String providerUrl;
 	private int providerPort;
 
 	public StreamConfig() {
-		this.clusters = List.of(PropertiesLoader.getProperty("clusters").split(","));
-		this.clusterDefault = PropertiesLoader.getProperty("cluster.default");
+		this.clusters = loadClusters();
 		this.topicFullPath = PropertiesLoader.getProperty("topic.fullpath");
 		this.subscription = PropertiesLoader.getProperty("subscription");
 		this.providerUrl = PropertiesLoader.getProperty("provider.url");
 		this.providerPort = Integer.parseInt(PropertiesLoader.getProperty("provider.port"));
 	}
 
-	public List<String> getClusters() {
+	private List<Cluster> loadClusters() {
+		List<Cluster> clusters = new ArrayList<>();
+		IntStream.range(0, MAX_CLUSTERS).forEach(i -> {
+			String clusterPrefix = "clusters." + i;
+			Cluster cluster = new Cluster();
+			String name = PropertiesLoader.getProperty(clusterPrefix + ".name");
+			if (name == null) {
+				return;
+			}
+			cluster.setName(name);
+			cluster.setUrl(PropertiesLoader.getProperty(clusterPrefix + ".url"));
+			cluster.setToken(PropertiesLoader.getProperty(clusterPrefix + ".token"));
+			cluster.setRegion(PropertiesLoader.getProperty(clusterPrefix + ".region"));
+			if ("true".equals(PropertiesLoader.getProperty(clusterPrefix + ".default"))) {
+				cluster.setDefault(true);
+				defaultCluster = cluster;
+			}
+			clusters.add(cluster);
+		});
+
+		if (defaultCluster == null) {
+			defaultCluster = clusters.get(0);
+		}
+
 		return clusters;
 	}
 
-	public String getClusterDefault() {
-		return clusterDefault;
+	public List<Cluster> getClusters() {
+		return clusters;
+	}
+
+	public Cluster getDefaultCluster() {
+		return defaultCluster;
 	}
 
 	public String getServiceUrlDefault() {
-		return getServiceUrl(clusterDefault);
+		return defaultCluster.getUrl();
 	}
 
 	public String getServiceUrl(String clusterName) {
@@ -37,7 +67,7 @@ public class StreamConfig {
 	}
 
 	public String getAuthTokenDefault() {
-		return getAuthToken(clusterDefault);
+		return defaultCluster.getToken();
 	}
 
 	public String getAuthToken(String name) {
