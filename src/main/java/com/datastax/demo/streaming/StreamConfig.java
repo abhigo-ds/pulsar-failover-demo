@@ -33,8 +33,8 @@ public class StreamConfig {
 				return;
 			}
 			cluster.setName(name);
-			cluster.setUrl(PropertiesLoader.getProperty(clusterPrefix + ".url"));
-			cluster.setToken(PropertiesLoader.getProperty(clusterPrefix + ".token"));
+			cluster.setServiceUrl(PropertiesLoader.getProperty(clusterPrefix + ".url"));
+			cluster.setAuthParamsString(PropertiesLoader.getProperty(clusterPrefix + ".token"));
 			cluster.setRegion(PropertiesLoader.getProperty(clusterPrefix + ".region"));
 			if ("true".equals(PropertiesLoader.getProperty(clusterPrefix + ".default"))) {
 				cluster.setDefault(true);
@@ -43,7 +43,8 @@ public class StreamConfig {
 			clusters.add(cluster);
 		});
 
-		if (defaultCluster == null) {
+		if (defaultCluster == null && clusters.size() > 0) {
+			clusters.get(0).setDefault(true);
 			defaultCluster = clusters.get(0);
 		}
 
@@ -56,22 +57,6 @@ public class StreamConfig {
 
 	public Cluster getDefaultCluster() {
 		return defaultCluster;
-	}
-
-	public String getServiceUrlDefault() {
-		return defaultCluster.getUrl();
-	}
-
-	public String getServiceUrl(String clusterName) {
-		return PropertiesLoader.getProperty("service.url." + clusterName);
-	}
-
-	public String getAuthTokenDefault() {
-		return defaultCluster.getToken();
-	}
-
-	public String getAuthToken(String name) {
-		return PropertiesLoader.getProperty("auth.token." + name);
 	}
 
 	public String getTopicFullPath() {

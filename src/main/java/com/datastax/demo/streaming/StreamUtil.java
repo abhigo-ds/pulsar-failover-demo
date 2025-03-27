@@ -7,9 +7,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.pulsar.client.api.AuthenticationFactory;
 import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.ServiceUrlProvider;
 import org.apache.pulsar.client.impl.ControlledClusterFailover;
 
@@ -42,18 +40,13 @@ public class StreamUtil {
 
 	public PulsarClient getControlledFailoverClient() {
 		try {
-			provider = ControlledClusterFailover.builder().defaultServiceUrl(config.getServiceUrlDefault())
+			provider = ControlledClusterFailover.builder().defaultServiceUrl(config.getDefaultCluster().getServiceUrl())
 					.checkInterval(5, TimeUnit.SECONDS).urlProvider(config.getProviderUrl()).build();
 			client = PulsarClient.builder().serviceUrlProvider(provider).build();
 			provider.initialize(client);
 		} catch (IOException e) {
 			e.printStackTrace();
-			try {
-				client = PulsarClient.builder().serviceUrl(config.getServiceUrlDefault())
-						.authentication(AuthenticationFactory.token(config.getAuthTokenDefault())).build();
-			} catch (PulsarClientException e1) {
-				e1.printStackTrace();
-			}
+			throw new RuntimeException("Error initializing Pulsar client: " + e.getMessage());
 		}
 
 		return client;

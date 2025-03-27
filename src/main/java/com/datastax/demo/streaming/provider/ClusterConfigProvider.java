@@ -55,7 +55,7 @@ public class ClusterConfigProvider {
 					// Set the current configuration
 					currentConfig = configMap.get(clusterName);
 					exchange.sendResponseHeaders(200, 0);
-					response = "Current config set to '" + clusterName + "' (" + currentConfig.getUrl() + ").";
+					response = "Current config set to '" + clusterName + "' (" + currentConfig.getServiceUrl() + ").";
 				}
 				try (OutputStream os = exchange.getResponseBody()) {
 					os.write(response.getBytes());

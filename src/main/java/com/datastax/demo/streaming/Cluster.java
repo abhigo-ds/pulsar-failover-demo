@@ -1,13 +1,19 @@
 package com.datastax.demo.streaming;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Cluster {
 
-	private static final String authPluginClassName = "org.apache.pulsar.client.impl.auth.AuthenticationToken";
+	private static final String AUTH_CLASS_NAME = "org.apache.pulsar.client.impl.auth.AuthenticationToken";
+	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	private String name;
-	private String url;
+	private String serviceUrl;
+	private String authPluginClassName = AUTH_CLASS_NAME;
+	private boolean tlsHostnameVerificationEnable = true;
+	private String authParamsString;
 	private String region;
-	private String token;
 	private boolean isDefault;
 
 	public String getName() {
@@ -18,28 +24,36 @@ public class Cluster {
 		this.name = name;
 	}
 
-	public String getUrl() {
-		return url;
+	public String getServiceUrl() {
+		return serviceUrl;
 	}
 
-	public void setUrl(String url) {
-		this.url = url;
+	public void setServiceUrl(String serviceUrl) {
+		this.serviceUrl = serviceUrl;
 	}
 
+	public String getAuthPluginClassName() {
+		return authPluginClassName;
+	}
+
+	public boolean isTlsHostnameVerificationEnable() {
+		return tlsHostnameVerificationEnable;
+	}
+
+	public String getAuthParamsString() {
+		return authParamsString;
+	}
+
+	public void setAuthParamsString(String authParamsString) {
+		this.authParamsString = authParamsString;
+	}
+	
 	public String getRegion() {
 		return region;
 	}
 
 	public void setRegion(String region) {
 		this.region = region;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	public boolean isDefault() {
@@ -50,10 +64,8 @@ public class Cluster {
 		this.isDefault = isDefault;
 	}
 
-	public String toJson() {
-		return String.format(
-				"{" + "\"serviceUrl\":\"%s\", " + "\"authPluginClassName\":\"%s\","
-						+ "\"tlsHostnameVerificationEnable\":\"true\"," + "\"authParamsString\":\"%s\"}",
-				url, authPluginClassName, token);
+	public String toJson() throws JsonProcessingException {
+		return MAPPER.writeValueAsString(this);
 	}
+
 }
