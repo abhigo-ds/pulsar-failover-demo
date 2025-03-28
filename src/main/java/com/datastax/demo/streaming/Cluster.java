@@ -47,7 +47,7 @@ public class Cluster {
 	public void setAuthParamsString(String authParamsString) {
 		this.authParamsString = authParamsString;
 	}
-	
+
 	public String getRegion() {
 		return region;
 	}
