@@ -14,6 +14,7 @@ public class StreamConfig {
 	private String subscription;
 	private String providerUrl;
 	private int providerPort;
+	private int expireSeconds;
 
 	public StreamConfig() {
 		this.clusters = loadClusters();
@@ -21,6 +22,7 @@ public class StreamConfig {
 		this.subscription = PropertiesLoader.getProperty("subscription");
 		this.providerUrl = PropertiesLoader.getProperty("provider.url");
 		this.providerPort = Integer.parseInt(PropertiesLoader.getProperty("provider.port"));
+		this.expireSeconds = Integer.parseInt(PropertiesLoader.getProperty("provider.expire.seconds"));
 	}
 
 	private List<Cluster> loadClusters() {
@@ -85,6 +87,10 @@ public class StreamConfig {
 
 	public int getProviderPort() {
 		return providerPort;
+	}
+
+	public int getExpireSeconds() {
+		return expireSeconds;
 	}
 
 }

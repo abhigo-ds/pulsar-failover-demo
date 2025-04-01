@@ -6,6 +6,9 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections4.map.PassiveExpiringMap;
 
 import com.datastax.demo.streaming.Cluster;
 import com.datastax.demo.streaming.StreamConfig;
@@ -16,7 +19,7 @@ import com.sun.net.httpserver.HttpServer;
 
 public class SmartConfigProvider {
 
-	private static final Map<String, Instance> instances = new ConcurrentHashMap<>();
+	private static Map<String, Instance> instances = null;
 	private static final Map<String, Group> groups = new ConcurrentHashMap<>();
 	private static final Map<String, Cluster> clusters = new ConcurrentHashMap<>();
 	private static final Map<String, Group> regions = new ConcurrentHashMap<>();
@@ -25,6 +28,7 @@ public class SmartConfigProvider {
 
 	public static void main(String[] args) throws IOException {
 		StreamConfig config = new StreamConfig();
+		instances = new PassiveExpiringMap<>(TimeUnit.SECONDS.toMillis(config.getExpireSeconds()));
 		mapClusterToRegionAndDefaultGroup(config);
 
 		HttpServer server = HttpServer.create(new InetSocketAddress(config.getProviderPort()), 0);
@@ -116,7 +120,7 @@ public class SmartConfigProvider {
 
 		private Instance createValidInstace(HttpExchange exchange, String name, String regionName, String groupName)
 				throws IOException {
-			if (null == groupName) {
+			if (null == groupName || groupName.isBlank()) {
 				if (null == regions.get(regionName)) {
 					System.err.println("Region must be a valid existing Region!");
 					sendResponse(exchange, 404, "Region must be a valid existing Region!");
