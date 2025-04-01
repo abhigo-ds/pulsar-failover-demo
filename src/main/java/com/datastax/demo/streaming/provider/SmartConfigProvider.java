@@ -25,7 +25,7 @@ public class SmartConfigProvider {
 
 	public static void main(String[] args) throws IOException {
 		StreamConfig config = new StreamConfig();
-		config.getClusters().forEach(cluster -> clusters.put(cluster.getName(), cluster));
+		mapClusterToRegionAndDefaultGroup(config);
 
 		HttpServer server = HttpServer.create(new InetSocketAddress(config.getProviderPort()), 0);
 		server.createContext("/getconfig", new GetConfigHandler());
@@ -36,6 +36,16 @@ public class SmartConfigProvider {
 		server.setExecutor(null);
 		server.start();
 		System.out.println("SmartConfigProvider started at port " + config.getProviderPort());
+	}
+
+	private static void mapClusterToRegionAndDefaultGroup(StreamConfig config) {
+		config.getClusters().forEach(cluster -> {
+			clusters.put(cluster.getName(), cluster);
+			Group group = new Group("Default-" + cluster.getName() + "-Group", cluster.getName());
+			groups.put(group.name, group);
+			System.out.println("Created default group " + group.name + " for cluster " + cluster.getName());
+			regions.put(cluster.getRegion(), group);
+		});
 	}
 
 	static class GetConfigHandler implements HttpHandler {
@@ -71,6 +81,7 @@ public class SmartConfigProvider {
 					instance.group = newGroup;
 					sendResponse(exchange, 200, mapper.writeValueAsString(instance));
 				} else {
+					System.err.println("Instance not found");
 					sendResponse(exchange, 404, "Instance not found");
 				}
 			} else {
@@ -83,48 +94,43 @@ public class SmartConfigProvider {
 			if ("instances".equalsIgnoreCase(name)) {
 				sendResponse(exchange, 200, mapper.writeValueAsString(instances.values()));
 			} else {
+				if (name == null || null == regionName) {
+					System.err.println("Name and Region are mandarory for new instance creation!");
+					sendResponse(exchange, 404, "Name and Region are mandarory for new instance creation!");
+					return;
+				}
 				Instance instance = instances.get(name);
 				if (instance == null) {
-					if (null == regionName) {
-						sendResponse(exchange, 404, "Region is mandarory for new instance creation!");
+					instance = createValidInstace(exchange, name, regionName, groupName);
+					if (instance == null) {
 						return;
 					}
-					Instance newInstance = new Instance();
-					newInstance.name = name;
-					newInstance.region = regionName;
-					if (null != groupName) {
-						newInstance.group = groupName;
-					} else {
-						if (null == regions.get(regionName)) {
-							sendResponse(exchange, 404, "Region must be a valid existing Region!");
-							return;
-						}
-						newInstance.group = regions.get(regionName).name;
-					}
-					if (null == newInstance.group || null == groups.get(newInstance.group)) {
-						sendResponse(exchange, 404,
-								"Region must be associated with a group prior to instance creation!");
-						return;
-					}
-					Group group = groups.get(newInstance.group);
-					if (null == clusters.get(group.cluster)) {
-						sendResponse(exchange, 404,
-								"Group must be associated with a cluster prior to instance creation!");
-						return;
-					}
-					Cluster cluster = clusters.get(group.cluster);
-					if (null == cluster) {
-						sendResponse(exchange, 404, "Cluster not found for the group!");
-						return;
-					}
-					instances.put(name, newInstance);
-					instance = instances.get(name);
+					instances.put(name, instance);
 				}
 				Group group = groups.get(instance.group);
 				Cluster cluster = clusters.get(group.cluster);
 				InstanceDetails instanceDetails = new InstanceDetails(instance, group, cluster);
 				sendResponse(exchange, 200, mapper.writeValueAsString(instanceDetails));
 			}
+		}
+
+		private Instance createValidInstace(HttpExchange exchange, String name, String regionName, String groupName)
+				throws IOException {
+			if (null == groupName) {
+				if (null == regions.get(regionName)) {
+					System.err.println("Region must be a valid existing Region!");
+					sendResponse(exchange, 404, "Region must be a valid existing Region!");
+					return null;
+				}
+				groupName = regions.get(regionName).name;
+			} else {
+				if (null == groups.get(groupName)) {
+					System.err.println("Group must be a valid existing Group!");
+					sendResponse(exchange, 404, "Group must be a valid existing Group!");
+					return null;
+				}
+			}
+			return new Instance(name, regionName, groupName);
 		}
 	}
 
@@ -147,6 +153,7 @@ public class SmartConfigProvider {
 					group.cluster = newCluster;
 					sendResponse(exchange, 200, mapper.writeValueAsString(group));
 				} else {
+					System.err.println("Group not found");
 					sendResponse(exchange, 404, "Group not found");
 				}
 			} else if ("DELETE".equalsIgnoreCase(method)) {
@@ -155,6 +162,7 @@ public class SmartConfigProvider {
 				if (removed != null) {
 					sendResponse(exchange, 200, "Group deleted");
 				} else {
+					System.err.println("Group not found");
 					sendResponse(exchange, 404, "Group not found");
 				}
 			} else {
@@ -204,11 +212,22 @@ public class SmartConfigProvider {
 		public String name;
 		public String region;
 		public String group;
+
+		public Instance(String name, String region, String group) {
+			this.name = name;
+			this.region = region;
+			this.group = group;
+		}
 	}
 
 	static class Group {
 		public String name;
 		public String cluster;
+
+		public Group(String name, String cluster) {
+			this.name = name;
+			this.cluster = cluster;
+		}
 	}
 
 	static class InstanceDetails {
