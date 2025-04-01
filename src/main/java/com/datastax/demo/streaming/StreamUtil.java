@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -18,22 +17,19 @@ public class StreamUtil {
 	private ServiceUrlProvider provider = null;
 	private PulsarClient client = null;
 	private DateTimeFormatter dtfDateTime = null;
-	private Map<String, String> providerHeaders = null;
 	private String name = null;
 
 	public StreamUtil(String[] args) {
 		config = new StreamConfig();
-		providerHeaders = new HashMap<>();
-		validateArgs(args);
+		Map<String, String> providerHeaders = validateArgs(args);
 		// Initialize Provider & Client
-		getControlledFailoverClient();
+		getControlledFailoverClient(providerHeaders);
 		try {
 			TimeUnit.SECONDS.sleep(6);
 		} catch (InterruptedException ie) {
 			Thread.currentThread().interrupt();
 		}
 		dtfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
 	}
 
 	public String getcurrentTime() {
@@ -44,7 +40,7 @@ public class StreamUtil {
 		return client;
 	}
 
-	public PulsarClient getControlledFailoverClient() {
+	public PulsarClient getControlledFailoverClient(Map<String, String> providerHeaders) {
 		try {
 			provider = ControlledClusterFailover.builder().defaultServiceUrl(config.getDefaultCluster().getServiceUrl())
 					.checkInterval(5, TimeUnit.SECONDS).urlProvider(config.getProviderUrl())
@@ -89,10 +85,10 @@ public class StreamUtil {
 		return remainder;
 	}
 
-	public void validateArgs(String[] args) {
-		if (args == null || args.length == 0) {
-			throw new IllegalArgumentException("Mandatory arguments missing!");
-		} else if (args.length < 2 || args.length > 3) {
+	public Map<String, String> validateArgs(String[] args) {
+		if (args == null || args.length < 2) {
+			throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
+		} else if (args.length > 3) {
 			throw new IllegalArgumentException("Incorrect number of arguments!");
 		}
 
@@ -100,12 +96,9 @@ public class StreamUtil {
 		name = args[0];
 		String region = args[1];
 		String group = (args.length == 3 ? args[2] : "");
-		System.out.printf("Producer: %s,%nRegion: %s,%nGroup: %s%n", name, region, group);
+		System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
 
-		// Setting provider headers
-		providerHeaders.put("name", name);
-		providerHeaders.put("region", region);
-		providerHeaders.put("group", group);
+		return Map.of("name", name, "region", region, "group", group);
 	}
 
 	public String getAppName() {

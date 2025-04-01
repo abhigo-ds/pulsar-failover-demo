@@ -52,7 +52,7 @@ public class SmartConfigProvider {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			if ("GET".equals(exchange.getRequestMethod())) {
-				String name = exchange.getRequestHeaders().getFirst("Instance");
+				String name = exchange.getRequestHeaders().getFirst("Name");
 				String region = exchange.getRequestHeaders().getFirst("Region");
 				String group = exchange.getRequestHeaders().getFirst("Group");
 				new InstanceHandler().handleInstanceGet(exchange, name, region, group);
