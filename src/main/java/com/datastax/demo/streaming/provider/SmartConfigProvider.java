@@ -73,21 +73,6 @@ public class SmartConfigProvider {
 			if ("GET".equalsIgnoreCase(method)) {
 				String name = getLastPartOfPath(exchange);
 				handleInstanceGet(exchange, name, null, null);
-			} else if ("POST".equalsIgnoreCase(method)) {
-				Instance instance = mapper.readValue(exchange.getRequestBody(), Instance.class);
-				instances.put(instance.name, instance);
-				sendResponse(exchange, 201, mapper.writeValueAsString(instance));
-			} else if ("PATCH".equalsIgnoreCase(method)) {
-				String name = getLastPartOfPath(exchange);
-				String newGroup = getQueryParam(exchange, "new-group");
-				Instance instance = instances.get(name);
-				if (instance != null) {
-					instance.group = newGroup;
-					sendResponse(exchange, 200, mapper.writeValueAsString(instance));
-				} else {
-					System.err.println("Instance not found");
-					sendResponse(exchange, 404, "Instance not found");
-				}
 			} else {
 				sendResponse(exchange, 405, "Method Not Allowed");
 			}
@@ -217,6 +202,9 @@ public class SmartConfigProvider {
 		public String region;
 		public String group;
 
+		public Instance() {
+		}
+
 		public Instance(String name, String region, String group) {
 			this.name = name;
 			this.region = region;
@@ -227,6 +215,9 @@ public class SmartConfigProvider {
 	static class Group {
 		public String name;
 		public String cluster;
+
+		public Group() {
+		}
 
 		public Group(String name, String cluster) {
 			this.name = name;

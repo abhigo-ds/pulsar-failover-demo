@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.datastax.demo.streaming</groupId>
 	<artifactId>producer_failover</artifactId>
-	<version>2.1.1</version>
+	<version>2.2.1</version>
 	<name>Producer</name>
 
 
