@@ -31,7 +31,7 @@ public class ProducerApp {
 	 * @throws IOException Exception thrown from the app
 	 */
 	public static void main(String[] args) throws IOException {
-		StreamUtil util = new StreamUtil(args,"");
+		StreamUtil util = new StreamUtil(args, "");
 		PulsarClient client = util.getClient();
 		Producer<byte[]> producer = client.newProducer().producerName(util.getName())
 				.topic(util.getConfig().getTopicFullPath())

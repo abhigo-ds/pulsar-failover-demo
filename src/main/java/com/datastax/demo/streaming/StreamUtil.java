@@ -85,55 +85,56 @@ public class StreamUtil {
 		return remainder;
 	}
 
-    /**
-     * This method validates and process the CLI arguments as part of the application startup.
-     * Based on the validation this method will either throw an exception or return
-     * {@code providerHeaders}
-     *
-     * @param args See below for the list of CLI required at the runtime.
-     * @return {@code providerHeaders} of type {@code Map<String, String>}
-     * @throws IllegalArgumentException Depending on the missing or incorrect number of CLI arguments.
-     */
-    public Map<String, String> validateArgs(String[] args, String appName) {
+	/**
+	 * This method validates and process the CLI arguments as part of the
+	 * application startup. Based on the validation this method will either throw an
+	 * exception or return {@code providerHeaders}
+	 *
+	 * @param args See below for the list of CLI required at the runtime.
+	 * @return {@code providerHeaders} of type {@code Map<String, String>}
+	 * @throws IllegalArgumentException Depending on the missing or incorrect number
+	 *                                  of CLI arguments.
+	 */
+	public Map<String, String> validateArgs(String[] args, String appName) {
 
-        if (args == null || args.length < 2) {
-            throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
-        } else if (("Consumer".equalsIgnoreCase(appName) && args.length > 4)
-                || (!"Consumer".equalsIgnoreCase(appName) && args.length > 3)) {
-            throw new IllegalArgumentException("Incorrect number of arguments!");
-        }
+		if (args == null || args.length < 2) {
+			throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
+		} else if (("Consumer".equalsIgnoreCase(appName) && args.length > 4)
+				|| (!"Consumer".equalsIgnoreCase(appName) && args.length > 3)) {
+			throw new IllegalArgumentException("Incorrect number of arguments!");
+		}
 
-        // CLI args
-        name = args[0];
-        String region = "";
-        String group = "";
-        if ("Consumer".equalsIgnoreCase(appName)) {
-            region = args[2];
-            group = (args.length == 4 ? args[3] : "");
-        } else {
-            region = args[1];
-            group = (args.length == 3 ? args[2] : "");
-        }
+		// CLI args
+		name = args[0];
+		String region = "";
+		String group = "";
+		if ("Consumer".equalsIgnoreCase(appName)) {
+			region = args[2];
+			group = (args.length == 4 ? args[3] : "");
+		} else {
+			region = args[1];
+			group = (args.length == 3 ? args[2] : "");
+		}
 
-        System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
+		System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
 
-        return Map.of("name", name, "region", region, "group", group);
-    }
+		return Map.of("name", name, "region", region, "group", group);
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String validateSubType(String subType) {
-        if (subType.equalsIgnoreCase("E")) {
-            return "Exclusive";
-        } else if (subType.equalsIgnoreCase("S")) {
-            return "Shared";
-        } else if (subType.equalsIgnoreCase("F")) {
-            return "Failover";
-        } else {
-            throw new IllegalArgumentException("Invalid subscription type!");
-        }
-    }
+	public String validateSubType(String subType) {
+		if (subType.equalsIgnoreCase("E")) {
+			return "Exclusive";
+		} else if (subType.equalsIgnoreCase("S")) {
+			return "Shared";
+		} else if (subType.equalsIgnoreCase("F")) {
+			return "Failover";
+		} else {
+			throw new IllegalArgumentException("Invalid subscription type!");
+		}
+	}
 
 }
