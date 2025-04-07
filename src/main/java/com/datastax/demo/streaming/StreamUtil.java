@@ -19,9 +19,9 @@ public class StreamUtil {
 	private DateTimeFormatter dtfDateTime = null;
 	private String name = null;
 
-	public StreamUtil(String[] args) {
+	public StreamUtil(String[] args, String appName) {
 		config = new StreamConfig();
-		Map<String, String> providerHeaders = validateArgs(args);
+		Map<String, String> providerHeaders = validateArgs(args, appName);
 		// Initialize Provider & Client
 		getControlledFailoverClient(providerHeaders);
 		try {
@@ -85,24 +85,55 @@ public class StreamUtil {
 		return remainder;
 	}
 
-	public Map<String, String> validateArgs(String[] args) {
-		if (args == null || args.length < 2) {
-			throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
-		} else if (args.length > 3) {
-			throw new IllegalArgumentException("Incorrect number of arguments!");
-		}
+    /**
+     * This method validates and process the CLI arguments as part of the application startup.
+     * Based on the validation this method will either throw an exception or return
+     * {@code providerHeaders}
+     *
+     * @param args See below for the list of CLI required at the runtime.
+     * @return {@code providerHeaders} of type {@code Map<String, String>}
+     * @throws IllegalArgumentException Depending on the missing or incorrect number of CLI arguments.
+     */
+    public Map<String, String> validateArgs(String[] args, String appName) {
 
-		// CLI args
-		name = args[0];
-		String region = args[1];
-		String group = (args.length == 3 ? args[2] : "");
-		System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
+        if (args == null || args.length < 2) {
+            throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
+        } else if (("Consumer".equalsIgnoreCase(appName) && args.length > 4)
+                || (!"Consumer".equalsIgnoreCase(appName) && args.length > 3)) {
+            throw new IllegalArgumentException("Incorrect number of arguments!");
+        }
 
-		return Map.of("name", name, "region", region, "group", group);
-	}
+        // CLI args
+        name = args[0];
+        String region = "";
+        String group = "";
+        if ("Consumer".equalsIgnoreCase(appName)) {
+            region = args[2];
+            group = (args.length == 4 ? args[3] : "");
+        } else {
+            region = args[1];
+            group = (args.length == 3 ? args[2] : "");
+        }
 
-	public String getAppName() {
-		return name;
-	}
+        System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
+
+        return Map.of("name", name, "region", region, "group", group);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String validateSubType(String subType) {
+        if (subType.equalsIgnoreCase("E")) {
+            return "Exclusive";
+        } else if (subType.equalsIgnoreCase("S")) {
+            return "Shared";
+        } else if (subType.equalsIgnoreCase("F")) {
+            return "Failover";
+        } else {
+            throw new IllegalArgumentException("Invalid subscription type!");
+        }
+    }
 
 }

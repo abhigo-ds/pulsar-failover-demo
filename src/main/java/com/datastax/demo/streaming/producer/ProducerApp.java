@@ -31,9 +31,9 @@ public class ProducerApp {
 	 * @throws IOException Exception thrown from the app
 	 */
 	public static void main(String[] args) throws IOException {
-		StreamUtil util = new StreamUtil(args);
+		StreamUtil util = new StreamUtil(args,"");
 		PulsarClient client = util.getClient();
-		Producer<byte[]> producer = client.newProducer().producerName(util.getAppName())
+		Producer<byte[]> producer = client.newProducer().producerName(util.getName())
 				.topic(util.getConfig().getTopicFullPath())
 				// .sendTimeout(0, TimeUnit.SECONDS) //This is a required setting when
 				// deduplication is enabled
