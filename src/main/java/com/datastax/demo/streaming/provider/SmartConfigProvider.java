@@ -105,12 +105,13 @@ public class SmartConfigProvider {
 
 		private Instance createValidInstace(HttpExchange exchange, String name, String regionName, String groupName)
 				throws IOException {
+			if (null == regions.get(regionName)) {
+				System.err.println("Region must be a valid existing Region!");
+				sendResponse(exchange, 404, "Region must be a valid existing Region!");
+				return null;
+			}
+
 			if (null == groupName || groupName.isBlank()) {
-				if (null == regions.get(regionName)) {
-					System.err.println("Region must be a valid existing Region!");
-					sendResponse(exchange, 404, "Region must be a valid existing Region!");
-					return null;
-				}
 				groupName = regions.get(regionName).name;
 			} else {
 				if (null == groups.get(groupName)) {

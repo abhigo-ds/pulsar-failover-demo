@@ -18,8 +18,13 @@
 						"method": "GET",
 						"header": [
 							{
-								"key": "instance",
+								"key": "name",
 								"value": "Producer1",
+								"type": "text"
+							},
+							{
+								"key": "region",
+								"value": "US",
 								"type": "text"
 							}
 						],
@@ -47,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"cluster-name\": \"clusterB\"}",
+							"raw": "{\"cluster-name\": \"ClusterB\"}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -96,98 +101,6 @@
 					"response": []
 				},
 				{
-					"name": "Instance",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/instances/Producer1",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"instances",
-								"Producer1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Instances",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Producer1\",\n  \"region\": \"US\",\n  \"group\": \"Grp1\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/instances",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"instances"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Instances",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "PATCH",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Producer1\",\n  \"region\": \"US\",\n  \"group\": \"Grp1\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/instances/Producer1?new-group=Grp2",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"instances",
-								"Producer1"
-							],
-							"query": [
-								{
-									"key": "new-group",
-									"value": "Grp2"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Groups",
 					"request": {
 						"auth": {
@@ -219,7 +132,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Grp1\",\n  \"cluster\": \"ClusterA\"\n}",
+							"raw": "{\n  \"name\": \"GrpB\",\n  \"cluster\": \"ClusterB\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -253,7 +166,7 @@
 							"urlencoded": []
 						},
 						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/groups/Grp4?new-cluster=ClusterC",
+							"raw": "{{protocol}}://{{host}}:{{port}}/groups/Default-ClusterA-Group?new-cluster=ClusterB",
 							"protocol": "{{protocol}}",
 							"host": [
 								"{{host}}"
@@ -261,12 +174,12 @@
 							"port": "{{port}}",
 							"path": [
 								"groups",
-								"Grp4"
+								"Default-ClusterA-Group"
 							],
 							"query": [
 								{
 									"key": "new-cluster",
-									"value": "ClusterC"
+									"value": "ClusterB"
 								}
 							]
 						}

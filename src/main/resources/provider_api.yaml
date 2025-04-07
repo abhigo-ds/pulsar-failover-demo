@@ -17,35 +17,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Instance'
-    post:
-      summary: Register a new instance
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Instance'
-      responses:
-        '201':
-          description: Instance registered successfully
-
-  /instances/{name}:
-    patch:
-      summary: Update an instance's group
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: new-group
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Instance group updated successfully
 
   /groups:
     get:
