@@ -46,7 +46,7 @@ Finally start the **Consumer** app using command `java -cp target/producer_failo
 > - You can have as many (one or more) instances of `Producers` and `Consumer`, however you must have only one instance of `Provider`.  
 > - The command-line params `<unique-client-name>` and `<region>` are **_only_** applicable when using the `Smart Provider`  
 > - Consumer requires additional Subscription details command-line params `<subscription-name:subscription-type>` consisting of two component which are `:` seperated.  
->   - Subscription Name: This will be the subscription name that the consumer will attach itself to. **_If the subscription name does not exist, a new subscription will be created_** 
+>   - Subscription Name: This will be the subscription name that the consumer will attach itself to. **_If the subscription name does not exist, a new subscription will be created._** 
 >   - Subscription Type: Subscription type will determine the characteristics of the subscription and consumer behavior. Below are the details on different types of subscription.  
 >     - `S(Shared)` : A shared subscription allows multiple consumers to consume messages from a single topic in a round-robin fashion.
 >       - Subscription type Shared is treated as a default by this app. In case of the subscription type is not provided or is invalid/unknown the app will default to Shared subscription type.
@@ -55,9 +55,8 @@ Finally start the **Consumer** app using command `java -cp target/producer_failo
 >     - `F(Failover)` : In failover subscriptions, Pulsar designates one primary consumer and multiple standby consumers. If the primary consumer disconnects, the standby consumers begin consuming the subsequent unacknowledged messages.
 >       - This requires multi consumer setup to achieve primary-standby dynamic.
 >     - `K(Key shared)` : Key shared subscriptions allow multiple consumers to subscribe to a topic, and provide additional metadata in the form of keys that link messages to specific consumers.
->       - For the demo purpose of this app we will not be considering this subscription type.
-
-> For more information on Subscriptions and uses please refer to [Subscription Overview](https://docs.datastax.com/en/astra-streaming/astream-subscriptions.html) 
+>       - For the demo purpose of this app we will not be considering this subscription type.  
+>>#### ***For more information on Subscriptions and uses please refer to [Subscription Overview](https://docs.datastax.com/en/astra-streaming/astream-subscriptions.html)***
 
 ### Performing failover using Simple Provider
 The above demo app uses two [Astra Streaming](https://www.datastax.com/products/astra-streaming) SaaS clusters (ideally deployed in different regions) with bidirectional replication. [You can configure](https://github.com/datastax/pulsar-failover-demo/blob/main/src/main/resources/application.properties#L2) as many cluster as needed for your use-case. The `Simple Provider` will then allow you to mark any one cluster to be `Active` at anytime. All other cluster will be auto set to `Passive`.
