@@ -30,7 +30,8 @@ Below is a high-level diagram of the above components and the Pulsar Controlled 
  
  
 ### Building the app
-From root of this repo, run command `mvn clean package -Passembly`
+- Update applicable properties of the [application.properties](https://github.com/datastax/pulsar-failover-demo/blob/main/src/main/resources/application.properties) file based on your Pulsar environment and use-case
+- From root of this repo, run command `mvn clean package -Passembly`
 
 ### Running the app
 First start either the **Simple Provider** or the **Smart Provider** app using command 
