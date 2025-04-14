@@ -57,7 +57,7 @@ Finally start the **Consumer** app using command `java -cp target/producer_failo
 >     - `K(Key shared)` : Key shared subscriptions allow multiple consumers to subscribe to a topic, and provide additional metadata in the form of keys that link messages to specific consumers.
 >       - For the demo purpose of this app we will not be considering this subscription type.
 
->[!NOTE] For more information on Subscriptions and uses please refer to [Subscription Overview](https://docs.datastax.com/en/astra-streaming/astream-subscriptions.html) 
+> For more information on Subscriptions and uses please refer to [Subscription Overview](https://docs.datastax.com/en/astra-streaming/astream-subscriptions.html) 
 
 ### Performing failover using Simple Provider
 The above demo app uses two [Astra Streaming](https://www.datastax.com/products/astra-streaming) SaaS clusters (ideally deployed in different regions) with bidirectional replication. [You can configure](https://github.com/datastax/pulsar-failover-demo/blob/main/src/main/resources/application.properties#L2) as many cluster as needed for your use-case. The `Simple Provider` will then allow you to mark any one cluster to be `Active` at anytime. All other cluster will be auto set to `Passive`.
