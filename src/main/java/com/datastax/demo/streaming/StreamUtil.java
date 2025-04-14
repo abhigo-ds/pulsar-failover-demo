@@ -97,23 +97,23 @@ public class StreamUtil {
 	 */
 	public Map<String, String> validateArgs(String[] args, String appName) {
 
-		if (args == null || args.length < 2) {
-			throw new IllegalArgumentException("Mandatory arguments Name and/or Region missing!");
-		} else if (("Consumer".equalsIgnoreCase(appName) && args.length > 4)
-				|| (!"Consumer".equalsIgnoreCase(appName) && args.length > 3)) {
+		if (args == null) {
+			throw new IllegalArgumentException("Mandatory arguments missing!");
+		} else if (("Consumer".equalsIgnoreCase(appName) && (args.length < 3 || args.length > 4))
+				|| (!"Consumer".equalsIgnoreCase(appName) && (args.length < 2 || args.length > 3))) {
 			throw new IllegalArgumentException("Incorrect number of arguments!");
 		}
 
 		// CLI args
 		name = args[0];
-		String region = "";
-		String group = "";
+		String region;
+		String group;
 		if ("Consumer".equalsIgnoreCase(appName)) {
 			region = args[2];
 			group = (args.length == 4 ? args[3] : "");
 		} else {
-			region = args[1];
-			group = (args.length == 3 ? args[2] : "");
+			region = args[1]; //Producer Region
+			group = (args.length == 3 ? args[2] : ""); //Producer Group
 		}
 
 		System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
@@ -125,16 +125,30 @@ public class StreamUtil {
 		return name;
 	}
 
-	public String validateSubType(String subType) {
-		if (subType.equalsIgnoreCase("E")) {
-			return "Exclusive";
-		} else if (subType.equalsIgnoreCase("S")) {
-			return "Shared";
-		} else if (subType.equalsIgnoreCase("F")) {
-			return "Failover";
-		} else {
-			throw new IllegalArgumentException("Invalid subscription type!");
+
+	//SubName:SubType
+
+	public String validateSubDtls(String subDtls) {
+		int subLn = subDtls.split(":").length;
+		if (subLn == 0 || subLn > 2) throw new IllegalArgumentException("Incorrect or Unknown Subscription details!");
+
+		String subName = subDtls.split(":")[0];
+		if (subName.isBlank()) throw new IllegalArgumentException("Invalid Subscription name");
+		String subType = (subLn == 1 ? "D" : subDtls.split(":")[1]);
+		switch (subType) {
+			case "E":
+				subType = "Exclusive";
+				break;
+			case "F":
+				subType = "Failover";
+				break;
+			default:
+				System.out.print("S".equalsIgnoreCase(subType) ? "" : "WARNING: Invalid or Unknown Subscription Type, defaulting to: Shared");
+				subType = "Shared";
+				break;
 		}
+		System.out.printf("Subscription: %s:%s%n", subName, subType);
+		return String.format("%s:%s", subName, subType);
 	}
 
 }

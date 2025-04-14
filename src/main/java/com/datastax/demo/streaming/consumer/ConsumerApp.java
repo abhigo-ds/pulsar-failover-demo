@@ -26,8 +26,8 @@ public class ConsumerApp {
 	 *             {@literal Name:Type, these are colon seperated values.
 	 *                  Subscription Name and Type for the consumer. See below for the valid Subscription Types.}
 	 *             <ol>
+	 *             <li>{@literal S: }{@code Shared:} {@literal Default value. In case the Subscription Type value is wrong or unknown or not provided.}
 	 *             <li>{@literal E: }{@code Exclusive}
-	 *             <li>{@literal S: }{@code Shared}
 	 *             <li>{@literal F: }{@code Failover}
 	 *             </ol>
 	 *             <li>{@code args[2]}
@@ -44,11 +44,9 @@ public class ConsumerApp {
 	public static void main(String[] args) throws IOException, InterruptedException {
 
 		StreamUtil util = new StreamUtil(args, "Consumer");
-		String subDtls = args[1];
-		if (subDtls.split(":").length != 2)
-			throw new IllegalArgumentException("Invalid subscription name or type!");
+		String subDtls = util.validateSubDtls(args[1]);
 		String subName = subDtls.split(":")[0];
-		String subType = util.validateSubType(subDtls.split(":")[1]);
+		String subType = subDtls.split(":")[1];
 		PulsarClient client = util.getClient();
 
 		// Create consumer on a topic with a subscription
