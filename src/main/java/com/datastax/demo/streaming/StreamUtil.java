@@ -112,8 +112,8 @@ public class StreamUtil {
 			region = args[2];
 			group = (args.length == 4 ? args[3] : "");
 		} else {
-			region = args[1]; //Producer Region
-			group = (args.length == 3 ? args[2] : ""); //Producer Group
+			region = args[1]; // Producer Region
+			group = (args.length == 3 ? args[2] : ""); // Producer Group
 		}
 
 		System.out.printf("Starting Client: %s in Region: %s as part of Group: %s%n", name, region, group);
@@ -125,27 +125,29 @@ public class StreamUtil {
 		return name;
 	}
 
-
-	//SubName:SubType
+	// SubName:SubType
 
 	public String validateSubDtls(String subDtls) {
 		int subLn = subDtls.split(":").length;
-		if (subLn == 0 || subLn > 2) throw new IllegalArgumentException("Incorrect or Unknown Subscription details!");
+		if (subLn == 0 || subLn > 2)
+			throw new IllegalArgumentException("Incorrect or Unknown Subscription details!");
 
 		String subName = subDtls.split(":")[0];
-		if (subName.isBlank()) throw new IllegalArgumentException("Invalid Subscription name");
+		if (subName.isBlank())
+			throw new IllegalArgumentException("Invalid Subscription name");
 		String subType = (subLn == 1 ? "D" : subDtls.split(":")[1]);
 		switch (subType) {
-			case "E":
-				subType = "Exclusive";
-				break;
-			case "F":
-				subType = "Failover";
-				break;
-			default:
-				System.out.print("S".equalsIgnoreCase(subType) ? "" : "WARNING: Invalid or Unknown Subscription Type, defaulting to: Shared");
-				subType = "Shared";
-				break;
+		case "E":
+			subType = "Exclusive";
+			break;
+		case "F":
+			subType = "Failover";
+			break;
+		default:
+			System.out.print("S".equalsIgnoreCase(subType) ? ""
+					: "WARNING: Invalid or Unknown Subscription Type, defaulting to: Shared");
+			subType = "Shared";
+			break;
 		}
 		System.out.printf("Subscription: %s:%s%n", subName, subType);
 		return String.format("%s:%s", subName, subType);

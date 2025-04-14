@@ -26,7 +26,8 @@ public class ConsumerApp {
 	 *             {@literal Name:Type, these are colon seperated values.
 	 *                  Subscription Name and Type for the consumer. See below for the valid Subscription Types.}
 	 *             <ol>
-	 *             <li>{@literal S: }{@code Shared:} {@literal Default value. In case the Subscription Type value is wrong or unknown or not provided.}
+	 *             <li>{@literal S: }{@code Shared:}
+	 *             {@literal Default value. In case the Subscription Type value is wrong or unknown or not provided.}
 	 *             <li>{@literal E: }{@code Exclusive}
 	 *             <li>{@literal F: }{@code Failover}
 	 *             </ol>
