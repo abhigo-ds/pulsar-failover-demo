@@ -40,11 +40,31 @@ First start either the **Simple Provider** or the **Smart Provider** app using c
 
 Then start the **Producer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.producer.ProducerApp  <unique-client-name> <region>` 
 
-Finally start the **Consumer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp  <unique-client-name> <region>` 
+Finally start the **Consumer** app using command `java -cp target/producer_failover-*-jar-with-dependencies.jar com.datastax.demo.streaming.consumer.ConsumerApp  <unique-client-name> <Subscription(Name:Type)> <region>` 
 
 > [!NOTE]
-> You can have as many (one or more) instances of `Producers` and `Consumer`, however you must have only one instance of `Provider`.
-> The command-line params `<unique-client-name>` and `<region>` are only applicable when using the `Smart Provider`
+> Consumer requires additional command-line params to define the Subscription details where the consumer will attach itself please see below for details. 
+> Subscription details param consists of two component which are ":" seperated.  
+> #### Subscription Name:Subscription Type  
+> - Subscription Name: This will be the subscription name that the consumer will attach itself to. **_If the subscription name does not exist, a new subscription will be created_** 
+> - Subscription Type: Subscription type will determine the characteristics of the subscription and how the consumer behaves with the said subscription. 
+>  There are different types of subscription and user will have control over which one to select from. Below are the details on different types of subscription.
+>   - `S : Shared`
+>     - A shared subscription allows multiple consumers to consume messages from a single topic in a round-robin fashion. 
+>     - Subscription type Shared is treated as a default by this app. In case of the subscription type is not provided or is invalid/unknown the app will default to Shared subscription type. 
+>  - `E : Exclusive`
+>    - An exclusive subscription describes a basic publish-subscribe (pub-sub) pattern where a single consumer subscribes to a single topic and consumes from it.
+>    - If a subscription is marked as Exclusive, the system is restricted to a single consumer, request to bring up any additional consumer will result in error.
+>  - `F : Failover`
+>    - In failover subscriptions, Pulsar designates one primary consumer and multiple standby consumers. If the primary consumer disconnects, the standby consumers begin consuming the subsequent unacknowledged messages.
+>    - This requires multi consumer setup to achieve primary-standby dynamic.
+>  - `K : Key shared`
+>    - Key shared subscriptions allow multiple consumers to subscribe to a topic, and provide additional metadata in the form of keys that link messages to specific consumers.
+>    - For the demo purpose of this app we will not be considering this subscription type.
+
+> [!NOTE]
+> - You can have as many (one or more) instances of `Producers` and `Consumer`, however you must have only one instance of `Provider`.
+> - The command-line params `<unique-client-name>` and `<region>` are **_only_** applicable when using the `Smart Provider`
 
 
 ### Performing failover using Simple Provider
